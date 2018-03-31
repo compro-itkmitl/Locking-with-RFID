@@ -4,8 +4,9 @@
 #define SS_PIN 10
 #define RST_PIN 9
 RFID rfid(SS_PIN, RST_PIN);
-SoftwareSerial bluetooth(5, 6);
+SoftwareSerial bluetooth(6, 7);
 // Setup variables:
+char input;
 int serNum0, serNum1, serNum2, serNum3, serNum4;
 int i, j, cardCount=0;
 int buzz(int times,int dlay,int pin);
@@ -15,7 +16,7 @@ struct cardNumber{int serNum[5];};
 struct cardNumber cards[3];
 void setup()
 {
-Serial.begin(9600);
+Serial.begin(38400);
 SPI.begin();
 rfid.init();
 pinMode(8, OUTPUT);
@@ -58,6 +59,12 @@ if(rfid.isCard()){
     }
   }
   rfid.halt();
+  if(bluetooth.available()){
+    Serial.write(bluetooth.read());
+    }
+  if(Serial.available()){
+    bluetooth.write(Serial.read());
+    }
 }
 int buzz(int times,int dlay,int pin){
   int i;
@@ -70,7 +77,8 @@ int buzz(int times,int dlay,int pin){
 }
 int CardCheck(int serNum0,int serNum1,int serNum2,int serNum3,int serNum4){
   int temp = 0;
-  for(i=0;i<cardCount+1;i++) if(cards[i].serNum[0] == serNum0 && cards[i].serNum[1] == serNum1 && cards[i].serNum[2] == serNum2 && cards[i].serNum[3] == serNum3 && cards[i].serNum[4] == serNum4){
+  for(i=0;i<cardCount+1;i++) if(cards[i].serNum[0] == serNum0 && cards[i].serNum[1] == serNum1 && cards[i]
+  .serNum[2] == serNum2 && cards[i].serNum[3] == serNum3 && cards[i].serNum[4] == serNum4){
     temp += 1;
   }
   return temp;
