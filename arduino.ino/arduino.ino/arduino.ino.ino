@@ -6,17 +6,18 @@
 RFID rfid(SS_PIN, RST_PIN);
 SoftwareSerial bluetooth(6, 7);
 // Setup variables:
-char input;
+int input;
 int serNum0, serNum1, serNum2, serNum3, serNum4;
 int i, j, cardCount=0;
 int buzz(int times,int dlay,int pin);
 int CardCheck(int serNum0,int serNum1,int serNum2,int serNum3,int serNum4);
 int PosCheck(int serNum0,int serNum1,int serNum2,int serNum3,int serNum4);
+int Status;
 struct cardNumber{int serNum[5];};
 struct cardNumber cards[3];
 void setup()
 {
-Serial.begin(38400);
+Serial.begin(38400);  
 SPI.begin();
 rfid.init();
 pinMode(8, OUTPUT);
@@ -27,7 +28,6 @@ void loop()
 if(rfid.isCard()){
   if(rfid.readCardSerial()){
     Serial.println("Card Detected");
-    //Serial.print("Card Status : ");
     int temp;
     temp = CardCheck(rfid.serNum[0], rfid.serNum[1], rfid.serNum[2], rfid.serNum[3], rfid.serNum[4]);
     if(temp == 0){ //check if it is a new card or not.
@@ -59,13 +59,16 @@ if(rfid.isCard()){
     }
   }
   rfid.halt();
+  //end of RFID coding
   if(bluetooth.available()){
-    Serial.write(bluetooth.read());
+    char input = bluetooth.read();    
+    Serial.print(input);
     }
   if(Serial.available()){
     bluetooth.write(Serial.read());
     }
 }
+
 int buzz(int times,int dlay,int pin){
   int i;
   for(i=0;i<times;i++){
@@ -88,4 +91,4 @@ int PosCheck(int serNum0,int serNum1,int serNum2,int serNum3,int serNum4){
   for(i=0;i<cardCount+1;i++) if(cards[i].serNum[0] == serNum0 && cards[i].serNum[1] == serNum1 && cards[i].serNum[2] == serNum2 && cards[i].serNum[3] == serNum3 && cards[i].serNum[4] == serNum4){
     return i;
   }
- }
+}
