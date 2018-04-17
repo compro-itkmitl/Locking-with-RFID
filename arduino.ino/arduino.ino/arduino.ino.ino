@@ -1,12 +1,13 @@
+#include <EEPROM.h>
 #include <SoftwareSerial.h>
 #include <SPI.h>
 #include "RFID.h"
 #define SS_PIN 10
 #define RST_PIN 9
+#define Door 4
 RFID rfid(SS_PIN, RST_PIN);
 SoftwareSerial bluetooth(6, 7);
 // Setup variables:
-int input;
 int serNum0, serNum1, serNum2, serNum3, serNum4;
 int i, j, cardCount=0;
 int buzz(int times,int dlay,int pin);
@@ -15,13 +16,23 @@ int PosCheck(int serNum0,int serNum1,int serNum2,int serNum3,int serNum4);
 int Status;
 struct cardNumber{int serNum[5];};
 struct cardNumber cards[3];
+// EEPROM variable and function
+int card_count_address = 0;
+int start_address = 1;
+int end_address = start_address + 5;
+// Bluetooth variable and function
+String command = "";
+String test = "Sent From Bluetooth";
+char character;
+int stopper = 0;
+// 
 void setup()
 {
-Serial.begin(38400);  
+Serial.begin(9600);  
 SPI.begin();
 rfid.init();
 pinMode(8, OUTPUT);
-bluetooth.begin(38400);
+bluetooth.begin(9600);
 }
 void loop()
 {
@@ -61,11 +72,15 @@ if(rfid.isCard()){
   rfid.halt();
   //end of RFID coding
   if(bluetooth.available()){
-    char input = bluetooth.read();    
-    Serial.print(input);
+    character = bluetooth.read();
+    if(character == 'U') Serial.println("Hallelujah");
+    bluetooth.println("Unlocked");
     }
   if(Serial.available()){
-    bluetooth.write(Serial.read());
+    character = Serial.read();
+    command.concat(character);
+    bluetooth.print(command);
+    Serial.print(command);
     }
 }
 
