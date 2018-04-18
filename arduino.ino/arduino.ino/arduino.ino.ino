@@ -42,6 +42,8 @@ if(rfid.isCard()){
     int temp;
     int etemp;
     temp = CardCheck(rfid.serNum[0], rfid.serNum[1], rfid.serNum[2], rfid.serNum[3], rfid.serNum[4]);
+    Serial.println(temp);
+    Serial.println(EEPROM.read(0));
     //check if it is a new card or not.
     if(temp == 0){ // New card detected
       buzz(1, 200, 8);
@@ -72,6 +74,8 @@ if(rfid.isCard()){
       Serial.println(" ");
       }
     }
+    Serial.print(EEPROM.read(0));
+    Serial.println("Cards were stored.");
   }
   rfid.halt();
   //end of RFID coding
@@ -80,6 +84,13 @@ if(rfid.isCard()){
     if(character == 'U') Serial.println("Hallelujah");
     bluetooth.println("Unlocked");
     }
+  if(Serial.available()){
+    character = Serial.read();
+    if(character == 'R'){
+      EEPROM.write(0, 0);
+      Serial.println("Cards cleared");     }
+    }
+}
 int buzz(int times,int dlay,int pin){
   int i;
   for(i=0;i<times;i++){
@@ -100,7 +111,6 @@ int CardCheck(int serNum0,int serNum1,int serNum2,int serNum3,int serNum4){
       }
     card_address += 5;     
     }
-  }
   temp = 0;
   return temp;
 }
