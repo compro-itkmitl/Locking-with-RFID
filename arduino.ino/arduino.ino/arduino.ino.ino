@@ -8,23 +8,23 @@
 RFID rfid(SS_PIN, RST_PIN);
 SoftwareSerial bluetooth(6, 7);
 // Setup variables:
-int serNum0, serNum1, serNum2, serNum3, serNum4;
 int i, j, cardCount=0;
 int buzz(int times,int dlay,int pin);
+int Status;
+// RFID&Card variable and function
+int serNum0, serNum1, serNum2, serNum3, serNum4;
 int CardCheck(int serNum0,int serNum1,int serNum2,int serNum3,int serNum4);
 int PosCheck(int serNum0,int serNum1,int serNum2,int serNum3,int serNum4);
-int Status;
 struct cardNumber{int serNum[5];};
 struct cardNumber cards[3];
 // EEPROM variable and function
 int card_count_address = 0;
-int start_address = 1;
-int end_address = start_address + 5;
 // Bluetooth variable and function
 String command = "";
-String test = "Sent From Bluetooth";
 char character;
 int stopper = 0;
+// Door
+void door_command(int command);
 // 
 void setup()
 {
@@ -40,11 +40,16 @@ if(rfid.isCard()){
   if(rfid.readCardSerial()){
     Serial.println("Card Detected");
     int temp;
+    int etemp;
     temp = CardCheck(rfid.serNum[0], rfid.serNum[1], rfid.serNum[2], rfid.serNum[3], rfid.serNum[4]);
-    if(temp == 0){ //check if it is a new card or not.
+    //check if it is a new card or not.
+    if(temp == 0){ // New card detected
       buzz(1, 200, 8);
       buzz(2, 100, 8);
       Serial.println("New");
+      etemp = EEPROM.read(0);
+      etemp += 1;
+      EEPROM.update(0, etemp);
       for(i=0;i<5;i++){
         cards[cardCount].serNum[i] = rfid.serNum[i];
         }
@@ -54,7 +59,6 @@ if(rfid.isCard()){
         Serial.print(" ");
         }
       Serial.println(" ");
-      cardCount += 1;
       }
     else{
       buzz(1, 400, 8);
@@ -76,14 +80,6 @@ if(rfid.isCard()){
     if(character == 'U') Serial.println("Hallelujah");
     bluetooth.println("Unlocked");
     }
-  if(Serial.available()){
-    character = Serial.read();
-    command.concat(character);
-    bluetooth.print(command);
-    Serial.print(command);
-    }
-}
-
 int buzz(int times,int dlay,int pin){
   int i;
   for(i=0;i<times;i++){
@@ -94,16 +90,32 @@ int buzz(int times,int dlay,int pin){
   }
 }
 int CardCheck(int serNum0,int serNum1,int serNum2,int serNum3,int serNum4){
+  // return 0 if it's not a new card. Else return number.
   int temp = 0;
-  for(i=0;i<cardCount+1;i++) if(cards[i].serNum[0] == serNum0 && cards[i].serNum[1] == serNum1 && cards[i]
-  .serNum[2] == serNum2 && cards[i].serNum[3] == serNum3 && cards[i].serNum[4] == serNum4){
-    temp += 1;
+  int card_address = 1;
+  temp = EEPROM.read(0);
+  for(i=0;i<temp;i++){
+    if(EEPROM.read(card_address) == serNum0 && EEPROM.read(card_address+1) == serNum1 && EEPROM.read(card_address+2) == serNum2 && EEPROM.read(card_address+3) == serNum3 && EEPROM.read(card_address+4) == serNum4){
+      return i;
+      }
+    card_address += 5;     
+    }
   }
+  temp = 0;
   return temp;
 }
 int PosCheck(int serNum0,int serNum1,int serNum2,int serNum3,int serNum4){
+  // return a position stored in card
   int temp = 0;
   for(i=0;i<cardCount+1;i++) if(cards[i].serNum[0] == serNum0 && cards[i].serNum[1] == serNum1 && cards[i].serNum[2] == serNum2 && cards[i].serNum[3] == serNum3 && cards[i].serNum[4] == serNum4){
     return i;
   }
 }
+void door_command(int command){
+  if(command == 1){
+    digitalWrite(Door, HIGH);
+    }
+  else if(command == 2){
+    digitalWrite(Door, LOW);
+    }
+  }
