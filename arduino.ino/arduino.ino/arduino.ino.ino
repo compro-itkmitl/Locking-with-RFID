@@ -46,31 +46,32 @@ void loop()
 {
 if(rfid.isCard()){
   if(rfid.readCardSerial()){
-//    Serial.println("Card Detected");
-//    int temp;
-//    int etemp;
+    Serial.println("Card Detected");
+    int temp;
+    int etemp;
 
-//    //check if it is a new card or not.
-//    if(temp == 0){ // New card detected
-//      Serial.println("New");
-//      etemp = EEPROM.read(0);
-//      etemp += 1;
-//      int counter = 0;
-//      EEPROM.update(0, etemp);
-//      EEPROM.put(card_address, card);
-//      Serial.print("Registered, ID : ");
+    //check if it is a new card or not.
+    if(temp == 0){ // New card detected
+      Serial.println("New");
+      etemp = EEPROM.read(0);
+      etemp += 1;
+      int counter = 0;
+      EEPROM.update(0, etemp);
+      cardNumber card = {rfid.serNum[0],rfid.serNum[1],rfid.serNum[2],rfid.serNum[3],rfid.serNum[4]};
+      EEPROM.put(card_count_address, card);
+      Serial.print("Registered, ID : ");
 
-//      Serial.println(" ");
-//      }
-//    else{
-//      Serial.println("Already Registered.");
-//      Serial.print("ID : ");
-//      for(i=0;i<5;i++){
-//        Serial.print(rfid.serNum[i], HEX);
-//        Serial.print(" ");
-//        }
-//      Serial.println(" ");
-//      }
+      Serial.println(" ");
+      }
+    else{
+      Serial.println("Already Registered.");
+      Serial.print("ID : ");
+      for(i=0;i<5;i++){
+        Serial.print(rfid.serNum[i], HEX);
+        Serial.print(" ");
+        }
+      Serial.println(" ");
+      }
     }
   }
   rfid.halt();
