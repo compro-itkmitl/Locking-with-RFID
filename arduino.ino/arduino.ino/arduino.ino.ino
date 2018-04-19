@@ -15,10 +15,17 @@ int Status;
 int serNum0, serNum1, serNum2, serNum3, serNum4;
 int CardCheck(int serNum0,int serNum1,int serNum2,int serNum3,int serNum4);
 int PosCheck(int serNum0,int serNum1,int serNum2,int serNum3,int serNum4);
-struct cardNumber{int serNum[5];};
+struct cardNumber{
+  int serNum0;
+  int serNum1;
+  int serNum2;
+  int serNum3;
+  int serNum4;
+};
 struct cardNumber cards[3];
 // EEPROM variable and function
 int card_count_address = 0;
+int card_address = 1;
 // Bluetooth variable and function
 String command = "";
 char character;
@@ -42,30 +49,25 @@ if(rfid.isCard()){
     int temp;
     int etemp;
     temp = CardCheck(rfid.serNum[0], rfid.serNum[1], rfid.serNum[2], rfid.serNum[3], rfid.serNum[4]);
-    Serial.println(temp);
-    Serial.println(EEPROM.read(0));
     //check if it is a new card or not.
     if(temp == 0){ // New card detected
-      buzz(1, 200, 8);
-      buzz(2, 100, 8);
       Serial.println("New");
       etemp = EEPROM.read(0);
       etemp += 1;
       int counter = 0;
       EEPROM.update(0, etemp);
-      for(i=EEPROM.read(0)*5;i<EEPROM.read(0)*5+5;i++){
-        EEPROM.write(i, rfid.serNum[counter]);
-        counter += 1;
-        }
+      cardNumber card = {
+        rfid.serNum[0],rfid.serNum[1],rfid.serNum[2],rfid.serNum[3],rfid.serNum[4] 
+        };
+      EEPROM.put(card_address, card);
       Serial.print("Registered, ID : ");
       for(i=0;i<5;i++){
-        Serial.print(cards[cardCount].serNum[i], HEX);
+        Serial.print(rfid.serNum[i], HEX);
         Serial.print(" ");
         }
       Serial.println(" ");
       }
     else{
-      buzz(1, 400, 8);
       Serial.println("Already Registered.");
       Serial.print("ID : ");
       for(i=0;i<5;i++){
@@ -120,22 +122,14 @@ int buzz(int times,int dlay,int pin){
 }
 int CardCheck(int serNum0,int serNum1,int serNum2,int serNum3,int serNum4){
   // return 0 if it's not a new card. Else return number.
+  
   int temp;
-  temp = EEPROM.read(0);
-  for(i=1;i<EEPROM.length();i+=5){
-    if(EEPROM.read(i) == serNum0)
-    if(EEPROM.read(i+1) == serNum1)
-    if(EEPROM.read(i+2) == serNum2)
-    if(EEPROM.read(i+3) == serNum3)
-    if(EEPROM.read(i+4) == serNum4)
-    return i;
-    }
-  return 0;  
+    
 }
 int PosCheck(int serNum0,int serNum1,int serNum2,int serNum3,int serNum4){
   // return a position stored in card
   int temp = 0;
-  for(i=0;i<cardCount+1;i++) if(cards[i].serNum[0] == serNum0 && cards[i].serNum[1] == serNum1 && cards[i].serNum[2] == serNum2 && cards[i].serNum[3] == serNum3 && cards[i].serNum[4] == serNum4){
+  for(i=0;i<cardCount+1;i++) if(cards[i].serNum0 == serNum0 && cards[i].serNum1 == serNum1 && cards[i].serNum2 == serNum2 && cards[i].serNum3 == serNum3 && cards[i].serNum4 == serNum4){
     return i;
   }
 }
