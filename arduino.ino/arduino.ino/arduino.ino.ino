@@ -25,7 +25,8 @@ struct cardNumber{
 struct cardNumber cards[3];
 // EEPROM variable and function
 int card_count_address = 0;
-int card_address = 1;
+int card_start_address = 1;
+int card_pos_address = 100;
 // Bluetooth variable and function
 String command = "";
 char character;
@@ -45,40 +46,32 @@ void loop()
 {
 if(rfid.isCard()){
   if(rfid.readCardSerial()){
-    Serial.println("Card Detected");
-    int temp;
-    int etemp;
-    temp = CardCheck(rfid.serNum[0], rfid.serNum[1], rfid.serNum[2], rfid.serNum[3], rfid.serNum[4]);
-    //check if it is a new card or not.
-    if(temp == 0){ // New card detected
-      Serial.println("New");
-      etemp = EEPROM.read(0);
-      etemp += 1;
-      int counter = 0;
-      EEPROM.update(0, etemp);
-      cardNumber card = {
-        rfid.serNum[0],rfid.serNum[1],rfid.serNum[2],rfid.serNum[3],rfid.serNum[4] 
-        };
-      EEPROM.put(card_address, card);
-      Serial.print("Registered, ID : ");
-      for(i=0;i<5;i++){
-        Serial.print(rfid.serNum[i], HEX);
-        Serial.print(" ");
-        }
-      Serial.println(" ");
-      }
-    else{
-      Serial.println("Already Registered.");
-      Serial.print("ID : ");
-      for(i=0;i<5;i++){
-        Serial.print(rfid.serNum[i], HEX);
-        Serial.print(" ");
-        }
-      Serial.println(" ");
-      }
+//    Serial.println("Card Detected");
+//    int temp;
+//    int etemp;
+
+//    //check if it is a new card or not.
+//    if(temp == 0){ // New card detected
+//      Serial.println("New");
+//      etemp = EEPROM.read(0);
+//      etemp += 1;
+//      int counter = 0;
+//      EEPROM.update(0, etemp);
+//      EEPROM.put(card_address, card);
+//      Serial.print("Registered, ID : ");
+
+//      Serial.println(" ");
+//      }
+//    else{
+//      Serial.println("Already Registered.");
+//      Serial.print("ID : ");
+//      for(i=0;i<5;i++){
+//        Serial.print(rfid.serNum[i], HEX);
+//        Serial.print(" ");
+//        }
+//      Serial.println(" ");
+//      }
     }
-    Serial.print(EEPROM.read(0));
-    Serial.println("Cards were stored.");
   }
   rfid.halt();
   //end of RFID coding
@@ -100,7 +93,8 @@ if(rfid.isCard()){
   if(Serial.available()){
     character = Serial.read();
     if(character == 'R'){
-      EEPROM.write(0, 0);
+      EEPROM.write(card_count_address, 0);
+      EEPROM.write(card_pos_address, 1);
       Serial.println("Cards cleared");     }
     }
     if(character == 'S'){
@@ -121,18 +115,27 @@ int buzz(int times,int dlay,int pin){
   }
 }
 int CardCheck(int serNum0,int serNum1,int serNum2,int serNum3,int serNum4){
-  // return 0 if it's not a new card. Else return number.
-  
-  int temp;
-    
-}
-int PosCheck(int serNum0,int serNum1,int serNum2,int serNum3,int serNum4){
-  // return a position stored in card
+  // return 0 if it's a new card. Else return 1.
   int temp = 0;
-  for(i=0;i<cardCount+1;i++) if(cards[i].serNum0 == serNum0 && cards[i].serNum1 == serNum1 && cards[i].serNum2 == serNum2 && cards[i].serNum3 == serNum3 && cards[i].serNum4 == serNum4){
-    return i;
-  }
+  for(i=card_start_address;i<12;i++){
+    if(EEPROM.read(i) == serNum0) temp += 1;
+    if(EEPROM.read(i) == serNum1) temp += 1;
+    if(EEPROM.read(i) == serNum2) temp += 1;
+    if(EEPROM.read(i) == serNum3) temp += 1;
+    if(EEPROM.read(i) == serNum4) temp += 1;
+    }
+  if(temp == 5){
+    return 1;
+    }
+  else return 0;  
 }
+//int PosCheck(int serNum0,int serNum1,int serNum2,int serNum3,int serNum4){
+//  // return a position stored in card
+//  int temp = 0;
+//  for(i=0;i<cardCount+1;i++) if(cards[i].serNum0 == serNum0 && cards[i].serNum1 == serNum1 && cards[i].serNum2 == serNum2 && cards[i].serNum3 == serNum3 && cards[i].serNum4 == serNum4){
+//    return i;
+//  }
+//}
 void door_command(int command){
   if(command == 1){
     digitalWrite(Door, HIGH);
