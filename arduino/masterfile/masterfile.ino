@@ -1,7 +1,5 @@
+#include <RFID.h>
 #include <EEPROM.h>
-#include <SoftwareSerial.h>
-#include <SPI.h>
-#include "RFID.h"
 #define SS_PIN 10
 #define RST_PIN 9
 #define Buzz 3
