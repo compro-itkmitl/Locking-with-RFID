@@ -25,14 +25,17 @@ RFIDและArduinoมาประยุกต์ใช้ในการล็
 -   RST  -> 9
 -   VCC  -> 3.3V
 -   GND -> GND
+
 **Buzzer**
 - Dc+ -> 3
 - Dc- -> GND
+
 **Relay**
 - DC+ -> 5v
 - DC- -> GND
 - IN -> 4
 - Com -> Dc Splitter
+
 **Locking Module**
 - DC+ -> NO of 5v Relay
 - DC- -> GND of Dc Splitter
