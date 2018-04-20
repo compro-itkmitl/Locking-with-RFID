@@ -26,6 +26,8 @@ if (rfid.isCard()) {
   Serial.println("Card Detected");
   Serial.println("Checking");
   temp = CardCheck(rfid.serNum[0], rfid.serNum[1], rfid.serNum[2], rfid.serNum[3], rfid.serNum[4]);
+  Serial.println(temp);
+  delay(1000);
   if(temp == 0){
     Serial.println("New Card");
     if(EEPROM.read(Card1) == 0){
@@ -45,12 +47,33 @@ if (rfid.isCard()) {
       }
     else Serial.println("Limit reached.");
     }
-  }
-  else if(temp == 1){
-    
+   else if(temp == 1){
+      Serial.println("Key card is valid.");
     }
+  }
 }
 rfid.halt();
+//Serial Reset
+if(Serial.available()){
+  char command;
+  int i;
+  command = Serial.read();
+  if(command == 'R'){
+    EEPROM.write(Card1, 0);
+    EEPROM.write(Card2, 0);
+    EEPROM.write(Card3, 0);
+    for(i=10;i<15;i++){
+      EEPROM.write(i, 0);
+      }
+    for(i=20;i<25;i++){
+      EEPROM.write(i, 0);
+      }
+    for(i=30;i<35;i++){
+      EEPROM.write(i, 0);
+      }
+    Serial.println("Key card cleaned.");
+    }
+  }
 }
 int CardNumber1(int sernum0, int sernum1, int sernum2, int sernum3, int sernum4){
   int start_address = 10;
@@ -77,6 +100,7 @@ int CardNumber2(int sernum0, int sernum1, int sernum2, int sernum3, int sernum4)
     EEPROM.write(22, sernum2);
     EEPROM.write(23, sernum3);
     EEPROM.write(24, sernum4);
+    return 0;
     }
   }
 int CardNumber3(int sernum0, int sernum1, int sernum2, int sernum3, int sernum4){
@@ -84,4 +108,22 @@ int CardNumber3(int sernum0, int sernum1, int sernum2, int sernum3, int sernum4)
   if(sernum0 == EEPROM.read(30) && sernum1 == EEPROM.read(31) && sernum2 == EEPROM.read(32) && sernum3 == EEPROM.read(33) && sernum4 == EEPROM.read(34)){
     return 1;
     }
+  else{
+    EEPROM.write(30, sernum0);
+    EEPROM.write(31, sernum1);
+    EEPROM.write(32, sernum2);
+    EEPROM.write(33, sernum3);
+    EEPROM.write(34, sernum4);
+    return 0;
+    }
+  }
+int CardCheck(int sernum0, int sernum1, int sernum2, int sernum3, int sernum4){
+  int temp1, temp2, temp3;
+  temp1 = CardNumber1(sernum0, sernum1, sernum2, sernum3, sernum4);
+  temp2 = CardNumber2(sernum0, sernum1, sernum2, sernum3, sernum4);
+  temp3 = CardNumber3(sernum0, sernum1, sernum2, sernum3, sernum4);
+  if(temp1 == 1 || temp2 == 1 || temp3 == 1){
+    return 1;
+    }
+  else return 0;
   }
