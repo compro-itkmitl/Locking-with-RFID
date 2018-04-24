@@ -53,12 +53,16 @@ if (rfid.isCard()) {
       }
     else Serial.println("Limit reached.");
     }
-   else if(temp == 1){
+   else if(temp == 1 && (EEPROM.read(Card1) != 0) && (EEPROM.read(Card2) != 0) && (EEPROM.read(Card3) != 0)){
       Serial.println("Key card is valid.");
       buzzer(1, 300);
       digitalWrite(Lock, HIGH);
       delay(5000);
       digitalWrite(Lock, LOW);
+    }
+   else{
+      Serial.println("Uncompleted register.");
+      buzzer(3, 100);
     }
   }
 }
