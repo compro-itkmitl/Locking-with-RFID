@@ -110,7 +110,7 @@ if(Serial.available()){
   }
 }
 int CardNumber1(int sernum0, int sernum1, int sernum2, int sernum3, int sernum4, char comm){
-  int start_address = 10;
+  //Address started at 10
   if(sernum0 == EEPROM.read(10) && sernum1 == EEPROM.read(11) && sernum2 == EEPROM.read(12) && sernum3 == EEPROM.read(13) && sernum4 == EEPROM.read(14) && comm == 'C'){
     return 1;
     }
@@ -124,7 +124,7 @@ int CardNumber1(int sernum0, int sernum1, int sernum2, int sernum3, int sernum4,
   else return 0;
   }
 int CardNumber2(int sernum0, int sernum1, int sernum2, int sernum3, int sernum4, char comm){
-  int start_address = 20;
+  //Address started at 20
   if(sernum0 == EEPROM.read(20) && sernum1 == EEPROM.read(21) && sernum2 == EEPROM.read(22) && sernum3 == EEPROM.read(23) && sernum4 == EEPROM.read(24) && comm == 'C'){
     return 1;
     }
@@ -138,7 +138,7 @@ int CardNumber2(int sernum0, int sernum1, int sernum2, int sernum3, int sernum4,
   else return 0;
   }
 int CardNumber3(int sernum0, int sernum1, int sernum2, int sernum3, int sernum4, char comm){
-  int start_address = 30;
+  //Address started at 30
   if(sernum0 == EEPROM.read(30) && sernum1 == EEPROM.read(31) && sernum2 == EEPROM.read(32) && sernum3 == EEPROM.read(33) && sernum4 == EEPROM.read(34) && comm == 'C'){
     return 1;
     }
