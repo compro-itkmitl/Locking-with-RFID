@@ -33,7 +33,7 @@ if (rfid.isCard()) {
   temp = CardCheck(rfid.serNum[0], rfid.serNum[1], rfid.serNum[2], rfid.serNum[3], rfid.serNum[4]);
   Serial.println(temp);
   delay(200);
-  if(temp == 0){
+  if(temp == 0 && ((EEPROM.read(Card1) == 0) || (EEPROM.read(Card2) == 0) || (EEPROM.read(Card3) == 0))){
     Serial.println("New Card");
     buzzer(2, 100);
     if(EEPROM.read(Card1) == 0){
@@ -61,7 +61,7 @@ if (rfid.isCard()) {
       digitalWrite(Lock, LOW);
     }
    else{
-      Serial.println("Uncompleted register.");
+      Serial.println("Uncompleted register or Card slot is already full.");
       buzzer(3, 100);
     }
   }
